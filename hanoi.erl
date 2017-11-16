@@ -3,7 +3,7 @@
 
 %Creates a set of three towers with the first holding N disks.
 create_tower(0) -> io:format("The tower must start with at lest one disk.~n");
-create_tower(N) -> [lists:reverse(generate_first(N)),[],[]].
+create_tower(N) -> [generate_first(N),[],[]].
 
 %Creates the first tower(list) containing N elements.
 generate_first(1) -> [1];
@@ -19,21 +19,21 @@ display_tower(Towers) ->
 	io:format("Tower1: ~w~nTower2: ~w~nTower3: ~w~n",[First,Second,Third]).
 	
 %Remove the top disk from the given tower.
-remove_disk(1,Towers,N) -> [First | [Second | [Third | _]]] = Towers, [lists:delete(N,First),Second,Third];
-remove_disk(2,Towers,N) -> [First | [Second | [Third | _]]] = Towers, [First,lists:delete(N,Second),Third];
-remove_disk(3,Towers,N) -> [First | [Second | [Third | _]]] = Towers, [First,Second,lists:delete(N,Third)].
+remove_disk(1,Towers,N) -> [First | [Second | [Third | _]]] = Towers, [lists:reverse(lists:delete(N,lists:reverse(First))),Second,Third];
+remove_disk(2,Towers,N) -> [First | [Second | [Third | _]]] = Towers, [First,lists:reverse(lists:delete(N,lists:reverse(Second))),Third];
+remove_disk(3,Towers,N) -> [First | [Second | [Third | _]]] = Towers, [First,Second,lists:reverse(lists:delete(N,lists:reverse(Third)))].
 
 %Place a disk of specified size on the target tower.
-add_disk(1,Towers,N) -> [First | [Second | [Third | _]]] = Towers, [[N] ++ First,Second,Third];
-add_disk(2,Towers,N) -> [First | [Second | [Third | _]]] = Towers, [First,[N] ++ Second,Third];
-add_disk(3,Towers,N) -> [First | [Second | [Third | _]]] = Towers, [First,Second,[N] ++ Third].
+add_disk(1,Towers,N) -> [First | [Second | [Third | _]]] = Towers, [First ++ [N],Second,Third];
+add_disk(2,Towers,N) -> [First | [Second | [Third | _]]] = Towers, [First,Second ++ [N],Third];
+add_disk(3,Towers,N) -> [First | [Second | [Third | _]]] = Towers, [First,Second,Third ++ [N]].
 
 %Moves a single disk from one tower to another.
 move(_,A,_) when A > 3; A =< 0 -> io:format("The first tower value was out of bounds.~n");
 move(_,_,B) when B > 3; B =< 0 -> io:format("The second tower value was out of bounds.~n");
 move(Towers,A,B) ->
 	%Find the size of the disk on the given tower.
-	N = lists:nth(1,lists:nth(A,Towers)),
+	N = lists:nth(1,lists:reverse(lists:nth(A,Towers))),
 
 	%Remove the disk from the designated tower and add it to the target tower.
 	NewTowers = add_disk(B,remove_disk(A,Towers,N),N),
